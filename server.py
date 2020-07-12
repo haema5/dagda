@@ -2,7 +2,8 @@
 # -*- coding: utf-8 -*-
 
 # import models
-from models import User, Meta, Harp, Auth, create_tables, drop_tables, pg_db
+from models import User, Meta, Harp, Auth, Debug
+from models import create_tables, drop_tables, pg_db
 
 from bottle import Bottle, route, run, error, hook
 from bottle import redirect, request, response
@@ -11,9 +12,13 @@ from hashlib import sha512
 
 import json
 
-# drop_tables()
+drop_tables()
 create_tables()
 app = Bottle()
+
+
+def _debug(data):
+    res = Debug.create(event=data)
 
 
 @hook('before_request')
@@ -26,6 +31,19 @@ def _close_db():
     if not pg_db.is_closed():
         pg_db.close()
     # return response
+
+
+@route('/debug')
+def debug():
+    headers_string = ['{}: {}'.format(h, request.headers.get(h)) for h in request.headers.keys()]
+    json_data = request.json
+    data = 'URL={}, method={}\nheaders:\n{}, \njson: {}'.format(request.url,
+                                                                request.method,
+                                                                '\n'.join(headers_string),
+                                                                json.dumps(json_data)
+                                                                )
+    _debug(data)
+    return data
 
 
 @route('/json')
@@ -102,6 +120,7 @@ def restore():
             .execute())
 
     return new_passwd
+
 
 
 if __name__ == "__main__":

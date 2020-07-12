@@ -4,7 +4,8 @@
 from peewee import PostgresqlDatabase
 from peewee import Model
 from peewee import IntegerField, CharField, \
-    DateTimeField, IdentityField, ForeignKeyField
+    DateTimeField, IdentityField, ForeignKeyField, \
+    TextField
 
 from playhouse.postgres_ext import JSONField
 # from playhouse.shortcuts import model_to_dict, dict_to_model, update_model_from_dict
@@ -64,17 +65,24 @@ class Auth(BaseModel):
     user_id = ForeignKeyField(User, backref='tokens')
 
 
+class Debug(BaseModel):
+    """Table debug"""
+    id = IdentityField()
+    date = DateTimeField(default=datetime.datetime.now)
+    event = TextField()
+
+
 # Processing:
 def create_tables():
     """Create all tables in DB"""
     with pg_db:
-        pg_db.create_tables([User, Meta, Harp, Auth])
+        pg_db.create_tables([User, Meta, Harp, Auth, Debug])
 
 
 def drop_tables():
     """Drop all tables in DB"""
     with pg_db:
-        pg_db.drop_tables([User, Meta, Harp, Auth])
+        pg_db.drop_tables([User, Meta, Harp, Auth, Debug])
 
 
 if __name__ == '__main__':
