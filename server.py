@@ -33,7 +33,9 @@ def _close_db():
     # return response
 
 
-@route('/debug')
+@route('/debug', method='GET')
+@route('/debug', method='PUT')
+@route('/debug', method='POST')
 def debug():
     headers_string = ['{}: {}'.format(h, request.headers.get(h)) for h in request.headers.keys()]
     json_data = request.json
