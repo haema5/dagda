@@ -125,4 +125,5 @@ dmypy.json
 .pyre/
 
 config.py
+.config.py
 .idea/vcs.xml
