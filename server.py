@@ -54,11 +54,11 @@ def sign_up():
         return answer
 
     if User.select().where(User.login == data['login']):
-        answer = f'Login {data["login"]} already exists'
+        answer = f'Login already exists'
         return answer
 
     if User.select().where(User.email == data['email']):
-        answer = f'Email {data["email"]} already exists'
+        answer = f'Email already exists'
         return answer
 
     data['password'] = sha512(data['password'].encode()).hexdigest()
