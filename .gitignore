@@ -126,3 +126,5 @@ dmypy.json
 
 .idea/vcs.xml
 config.py
+*.xml
+.idea/deployment.xml

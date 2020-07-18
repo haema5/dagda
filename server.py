@@ -10,15 +10,22 @@ from bottle import redirect, request, response
 
 from hashlib import sha512
 
+from playhouse.shortcuts import model_to_dict, dict_to_model
 import json
 
-drop_tables()
-create_tables()
+# drop_tables()
+# create_tables()
 app = Bottle()
 
 
 def _debug(data):
     res = Debug.create(event=data)
+
+
+def date_to_str(data):
+    import datetime
+    if isinstance(data, (datetime.date, datetime.datetime)):
+        return data.isoformat()
 
 
 @hook('before_request')
@@ -57,13 +64,22 @@ def return_json():
 
 @route('/', method='GET')
 def index():
-    return 'Quake II - forever!'
+    data = {'message': 'Hello, World!'}
+    response.content_type = 'application/json'
+    return json.dumps(data)
 
 
-# @route('/users/<user_id>', methos='GET')
-# def list_users(user_id):
-#     output = recources.show_users(user_id)
-#     return output
+@route('/users', methos='GET')
+def list_users():
+    user_obj = User.select(User.login, User.join_date).get()
+    user_obj = model_to_dict(user_obj)
+
+    json_data = json.dumps(user_obj,
+                           sort_keys=True,
+                           indent=1,
+                           default=date_to_str)
+
+    return json_data
 
 
 @route('/sign-up', method='POST')
@@ -82,12 +98,9 @@ def sign_up():
         return answer
 
     data['password'] = sha512(data['password'].encode()).hexdigest()
-
-    # user, status = User.get_or_create(**data)
-    # answer = {'id': str(user), 'status': str(status)}
-
     user = User.create(**data)
     answer = str(user.id)
+
     return answer
 
 
@@ -98,12 +111,17 @@ def restore():
         answer = 'Request is empty'
         return answer
 
-    if not User.select().where(User.login == data['login']):
-        answer = f"Can't find {data['login']}"
+    if not User\
+            .select()\
+            .where(User.login == data['login']):
+        answer = f"Can't find user"
         return answer
 
-    if not User.select().where(User.email == data['email']):
-        answer = f"Email does not match user {data['login']}"
+    if not User\
+            .select()\
+            .where((User.login == data['login']) &
+                   (User.email == data['email'])):
+        answer = f"Email does not match user"
         return answer
 
     def generate_passwd():
@@ -122,7 +140,6 @@ def restore():
             .execute())
 
     return new_passwd
-
 
 
 if __name__ == "__main__":

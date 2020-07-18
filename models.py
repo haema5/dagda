@@ -15,13 +15,14 @@ import datetime
 from config import *
 
 # Connect to a Postgres database.
-pg_db = PostgresqlDatabase(
-    PG_DB,
-    user=PG_USER,
-    password=PG_SEC,
-    host=PG_HOST,
-    port=PG_PORT
-)
+# pg_db = PostgresqlDatabase(
+#     PG_DB,
+#     user=PG_USER,
+#     password=PG_SEC,
+#     host=PG_HOST,
+#     port=PG_PORT
+# )
+pg_db = PostgresqlDatabase(**PG_DATA)
 
 
 class BaseModel(Model):
@@ -56,7 +57,7 @@ class Harp(BaseModel):
     """Table harp"""
     id = IdentityField()
     data = JSONField()
-    user_id = ForeignKeyField(User, backref='harps')
+    author = ForeignKeyField(User, backref='harps')
 
 
 class Auth(BaseModel):
