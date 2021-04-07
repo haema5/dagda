@@ -1,4 +1,4 @@
-bottle==0.12.18
+bottle==0.12.19
 bottle-jwt==0.11
 peewee==3.13.3
 psycopg2==2.8.5
